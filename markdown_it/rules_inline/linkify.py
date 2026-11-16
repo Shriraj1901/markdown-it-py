@@ -39,6 +39,12 @@ def linkify(state: StateInline, silent: bool) -> bool:
     # disallow '*' at the end of the link (conflicts with emphasis)
     url = url.rstrip("*")
 
+    # The scheme is read from ``state.pending``, which is not up to date while a
+    # link label is being validated (silent mode), so it can be longer than the
+    # URL that was matched. Such a match cannot advance the position.
+    if len(url) <= len(proto):
+        return False
+
     full_url = state.md.normalizeLink(url)
     if not state.md.validateLink(full_url):
         return False
